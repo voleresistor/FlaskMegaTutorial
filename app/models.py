@@ -1,9 +1,11 @@
 from datetime import datetime
-from app import db
+from app import db, login
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 # Inherits from db.Model, a base class for all SQLAlchemy modules
 # Fiels variables are instances of db.Column class
-class User(db.Model):
+class User(UserMixin, db.Model):
     # id is our primary key
     id = db.Column(db.Integer, primary_key=True)
     # limit this column to 64 characters
@@ -21,6 +23,14 @@ class User(db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
+    # Set user password hash
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    # Compare password to password hash
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # We're building Twitter, I guess?
@@ -31,3 +41,9 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+
+# Implement user loader to support Flask-Login
+# @login.user_loader decorator registers this function with Flask-Login
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
