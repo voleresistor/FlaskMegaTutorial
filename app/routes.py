@@ -4,6 +4,7 @@ from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
+from datetime import datetime
 
 # Default/index page. This page requires user login
 @app.route('/')
@@ -86,3 +87,24 @@ def register():
         flash('Congrats, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+# User profile page
+# .first_or_404() automatically returns a 404 error
+# if requested user doesn't exist
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = [
+        {'author': user, 'body': 'Test post 1'},
+        {'author': user, 'body': 'Test post 2'}
+    ]
+    return render_template('user.html', user=user, posts=posts)
+
+# Perform actions before every request
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        # Flask-Login auto-invokes current user load so only commit is needed
+        db.session.commit()

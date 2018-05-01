@@ -2,6 +2,7 @@ from datetime import datetime
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from hashlib import md5
 
 # Inherits from db.Model, a base class for all SQLAlchemy modules
 # Fiels variables are instances of db.Column class
@@ -12,6 +13,10 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+
+    # Added for Chapter 6 to add decoration to user profile
+    about_me = db.Column(db.String(140))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Create one-to-many relationship to new Post object
     # Referenced by string containing class name (if class is defined in this file)
@@ -30,6 +35,12 @@ class User(UserMixin, db.Model):
     # Compare password to password hash
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    # Define how to view an avatar for each user
+    def avatar(self, size):
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return 'https://gravatar.com/avatar/{}?d=identicon&s={}'.format(
+            digest, size)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
