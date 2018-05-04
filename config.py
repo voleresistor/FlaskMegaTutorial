@@ -12,3 +12,11 @@ class Config(object):
 
     # Don't notify app every time a database change occurs
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Email error stacktraces to an administrator
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    ADMINS = ['admin1@example.com', 'admin2@example.com']
