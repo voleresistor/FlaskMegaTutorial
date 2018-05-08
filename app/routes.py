@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
+from app.models import User, Post
 from werkzeug.urls import url_parse
 from datetime import datetime
 
@@ -15,24 +15,27 @@ def before_request():
         db.session.commit()
 
 # Default/index page. This page requires user login
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.post.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post is now live!')
+        # Standard practice is to respond to POST with
+        # a redirect. This prevents refresh from re-submitting
+        # the form.
+        # See Post/Redirect/Get pattern.
+        return redirect(url_for('index'))
+
     # Dummy posts
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in my butt!'
-        },
-        {
-            'author': {'username': 'Cynthia'},
-            'body': 'The Avengers movie was formulaic and dull'
-        }
-    ]
+    posts = current_user.followed_posts().all()
 
     # Render index page
-    return render_template('index.html', title='Home', posts=posts) #user=current_user, 
+    return render_template('index.html', title='Home', form=form, posts=posts) #user=current_user, 
 
 # Flask-Login supported user login
 @app.route('/login', methods=['GET', 'POST'])
@@ -89,10 +92,7 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post 1'},
-        {'author': user, 'body': 'Test post 2'}
-    ]
+    posts = Post.query.filter_by(author=user).order_by(Post.timestamp.desc()).all()
     return render_template('user.html', user=user, posts=posts)
 
 # Allow user to edit their profile
@@ -144,3 +144,10 @@ def unfollow(username):
     db.session.commit()
     flash('You are not following {}.'.format(username))
     return redirect(url_for('user', username=username))
+
+# Explore view
+@app.route('/explore')
+@login_required
+def explore():
+    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    return render_template('index.html', title='Explore', posts=posts)
