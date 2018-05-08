@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from logging.handlers import SMTPHandler, RotatingFileHandler
+from flask_mail import Mail
 import logging, os
 
 # app here is an instance of Flask
@@ -21,6 +22,14 @@ migrate = Migrate(app, db)
 # Set redirect page when users navigate to protected pages
 login = LoginManager(app)
 login.login_view = 'login'
+
+# Handle sending emails to users
+# start mail server emulation with
+# python3 -m smtpd -n -c DebuggingServer localhost:8025
+# Add env vars
+# export MAIL_SERVER=localhost
+# export MAIL_PORT=8025
+mail = Mail(app)
 
 # Handle errors
 if not app.debug:
