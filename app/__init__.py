@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from logging.handlers import SMTPHandler, RotatingFileHandler
 from flask_mail import Mail
+from flask_bootstrap import Bootstrap
 import logging, os
 
 # app here is an instance of Flask
@@ -30,6 +31,10 @@ login.login_view = 'login'
 # export MAIL_SERVER=localhost
 # export MAIL_PORT=8025
 mail = Mail(app)
+
+# Flask-Bootstrap uses the Twitter css bootstrap files to
+# make simple styling easier
+bootstrap = Bootstrap(app)
 
 # Handle errors
 if not app.debug:
