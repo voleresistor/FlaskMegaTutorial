@@ -23,3 +23,6 @@ class Config(object):
 
     # Handle pagination
     POSTS_PER_PAGE = 25
+
+    # Add support for multiple languages using Flask-Babel
+    LANGUAGES = ['en', 'es']
