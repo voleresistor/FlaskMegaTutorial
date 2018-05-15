@@ -6,6 +6,7 @@ from flask_login import LoginManager
 from logging.handlers import SMTPHandler, RotatingFileHandler
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
+from flask_moment import Moment
 import logging, os
 
 # app here is an instance of Flask
@@ -35,6 +36,10 @@ mail = Mail(app)
 # Flask-Bootstrap uses the Twitter css bootstrap files to
 # make simple styling easier
 bootstrap = Bootstrap(app)
+
+# Flask-Moment helps with formatting dates and times to match
+# the user's locale settings
+moment = Moment(app)
 
 # Handle errors
 if not app.debug:

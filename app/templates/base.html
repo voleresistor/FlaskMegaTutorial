@@ -1,5 +1,11 @@
 {% extends 'bootstrap/base.html' %}
 <html>
+    <!-- The script block is defined by Bootstrap. This includes some
+    additional scripts that must be preserved with super() -->
+    {% block scripts %}
+        {{ super() }}
+        {{ moment.include_moment() }}
+    {% endblock %}
     <head>
         {% block title %}
         {% if title %}
