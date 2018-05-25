@@ -25,4 +25,4 @@ class Config(object):
     POSTS_PER_PAGE = 25
 
     # Add support for multiple languages using Flask-Babel
-    LANGUAGES = ['en', 'es']
+    LANGUAGES = ['en-US', 'en', 'es']
