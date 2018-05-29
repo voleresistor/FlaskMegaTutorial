@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
-from flask_bable import _
+from flask_babel import _
 from app import db
 from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm, \
@@ -34,7 +34,7 @@ def login():
             next_page = url_for('main.index')
         return redirect(next_page)
 
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template('auth/login.html', title='Sign In', form=form)
 
 # Log user out
 @bp.route('/logout')
@@ -55,7 +55,7 @@ def register():
         db.session.commit()
         flash('Congrats, you are now a registered user!')
         return redirect(url_for('auth.login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('auth/register.html', title='Register', form=form)
 
 # Generate and deliver password reset token
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
@@ -69,7 +69,7 @@ def reset_password_request():
             send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password')
         return redirect(url_for('auth.login'))
-    return render_template('reset_password_request.html',
+    return render_template('auth/reset_password_request.html',
         title='Reset Password', form=form)
 
 # Reset password
@@ -86,4 +86,4 @@ def reset_password(token):
         db.session.commit()
         flash('Your password has been reset.')
         return redirect(url_for('auth.login'))
-    return render_template('reset_password.html', form=form)
+    return render_template('auth/reset_password.html', form=form)

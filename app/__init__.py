@@ -11,8 +11,8 @@ from logging.handlers import SMTPHandler, RotatingFileHandler
 
 # app here is an instance of Flask
 # this object is a member of the app package
-app = Flask(__name__)
-app.config.from_object(Config)
+#app = Flask(__name__)
+#app.config.from_object(Config)
 
 # Database
 db = SQLAlchemy()
@@ -47,7 +47,7 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    db.init_app(db)
+    db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
@@ -59,15 +59,15 @@ def create_app(config_class=Config):
     # if it's imported higher up in the code
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
-    
+
     # Register auth Blueprint with main application
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    
+
     # Register main Blueprint with main application
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
-    
+
     # Handle errors
     if not app.debug and not app.testing:
         # Send email on error
@@ -89,7 +89,7 @@ def create_app(config_class=Config):
             )
             mail_handler.setLevel(logging.ERROR)
             app.logger.addHandler(mail_handler)
-    
+
         # Write error logs
         # Severity INFO or higher
         if not os.path.exists('logs'):
@@ -102,5 +102,5 @@ def create_app(config_class=Config):
         app.logger.addHandler(file_handler)
         app.logger.setLevel(logging.INFO)
         app.logger.info('Microblog startup')
-    
+
     return app

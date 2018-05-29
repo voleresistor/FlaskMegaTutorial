@@ -1,9 +1,9 @@
 from flask import render_template, flash, redirect, url_for, request, current_app
-from app import app, db
+from app import db
+from app.main import bp
 from app.main.forms import EditProfileForm, PostForm
 from flask_login import current_user, login_required
 from app.models import User, Post
-from app.auth import send_password_reset_email
 from datetime import datetime
 
 # Perform actions before every request
