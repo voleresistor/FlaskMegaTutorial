@@ -2,19 +2,34 @@ from datetime import datetime, timedelta
 from app import app, db
 from app.models import User, Post
 import unittest
+from config import Config
+
+# We can generate a new testing config before the app is initialized
+# This is much safer and cleaner and provides more consistency
+# in a unit testing situation
+# We're copying the main config here and just making changes as needed
+# TESTING is useful in a case where an app needs to be aware of its
+# environment
+class TestConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
 
 # Unit testing allows models to be repeatedly checked for consistency
 # after making changes. This ensures that models are still functional
 class UserModelCase(unittest.TestCase):
     # Create test database
     def setUp(self):
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        self.app = create_app(TestConfig)
+        # app_context is how the db instance knows where to work
+        self.app_context = self.app.app_context()
+        self.app_context.push()
         db.create_all()
 
     # Delete test database
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        self.app_context.pop()
 
     def test_password_hashing(self):
         u = User(username='susan')
