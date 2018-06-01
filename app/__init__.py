@@ -8,6 +8,7 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 import logging, os
 from logging.handlers import SMTPHandler, RotatingFileHandler
+from elasticsearch import Elasticsearch
 
 # app here is an instance of Flask
 # this object is a member of the app package
@@ -67,6 +68,10 @@ def create_app(config_class=Config):
     # Register main Blueprint with main application
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
+
+    # Create elastic search instance in the app
+    app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
+        if app.config['ELASTICSEARCH_URL'] else None
 
     # Handle errors
     if not app.debug and not app.testing:

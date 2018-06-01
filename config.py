@@ -26,3 +26,6 @@ class Config(object):
 
     # Handle pagination
     POSTS_PER_PAGE = 25
+
+    # Set up our searcher
+    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')

@@ -99,6 +99,10 @@ class User(UserMixin, db.Model):
         return User.query.get(id)
 
 class Post(db.Model):
+    # A __searchable__ attribute support the search abstraction
+    # Here we indicate that the body of posts should be indexed
+    __searchable__ = ['body']
+
     id = db.Column(db.Integer, primary_key=True)
     # We're building Twitter, I guess?
     body = db.Column(db.String(140))
